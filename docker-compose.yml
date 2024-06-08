@@ -1,0 +1,35 @@
+version: '3.7'
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+services:
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus 
+    volumes:
+      - ./config:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-admin-api'
+    ports:
+      - 9090:9090
+  webapp:
+    container_name: webapp
+    build:
+      context: webapp
+      dockerfile: Dockerfile
+    ports:
+      - 9000:9000
+  
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-oss
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+  
